@@ -4,7 +4,7 @@ import { makeQuestion, OP_NAMES, pick, PRAISE, ENCOURAGE } from '../levels'
 
 const ROUND_SIZE = 10
 
-export default function Drills({ level, onStars, onCelebrate }) {
+export default function Drills({ level, onStars, onCelebrate, onRecord = () => {} }) {
   const allOps = level.drill.ops
   const [selectedOps, setSelectedOps] = useState(allOps)
   const [phase, setPhase] = useState('config') // config | play | summary
@@ -62,6 +62,7 @@ export default function Drills({ level, onStars, onCelebrate }) {
         clearInterval(timerRef.current)
         setPhase('summary')
         const finalCorrect = correct + (good ? 1 : 0)
+        onRecord('drillsBestCorrect', finalCorrect, 'max')
         if (finalCorrect === ROUND_SIZE) {
           onStars(5) // bonus pentru rundă perfectă
           onCelebrate()

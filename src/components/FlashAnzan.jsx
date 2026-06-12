@@ -11,7 +11,7 @@ const SPEEDS = [
 
 const COUNTS = [3, 5, 7, 10]
 
-export default function FlashAnzan({ level, onStars, onCelebrate }) {
+export default function FlashAnzan({ level, onStars, onCelebrate, onRecord = () => {} }) {
   const [phase, setPhase] = useState('config') // config | countdown | flash | answer | result
   const [speed, setSpeed] = useState(level.flash.defaultSpeed)
   const [count, setCount] = useState(level.flash.defaultCount)
@@ -68,6 +68,7 @@ export default function FlashAnzan({ level, onStars, onCelebrate }) {
     if (correct) {
       const earned = Math.max(1, Math.round(count / 3))
       onStars(earned)
+      onRecord('flashWins', 1, 'inc')
       onCelebrate()
     }
     setPhase('result')

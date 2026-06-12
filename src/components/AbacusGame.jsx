@@ -9,7 +9,7 @@ const MODES = [
   { id: 'read', label: '👀 Citește abacul' },
 ]
 
-export default function AbacusGame({ level, onStars, onCelebrate }) {
+export default function AbacusGame({ level, onStars, onCelebrate, onRecord = () => {} }) {
   const rods = level.abacus.rods
   const maxNumber = Math.pow(10, rods) - 1
 
@@ -48,6 +48,7 @@ export default function AbacusGame({ level, onStars, onCelebrate }) {
       setFeedback({ good: true, text: pick(PRAISE) })
       setScore((s) => s + 1)
       onStars(1)
+      onRecord('abacusSolved', 1, 'inc')
       onCelebrate()
       const t = setTimeout(newTarget, 1600)
       return () => clearTimeout(t)
@@ -59,6 +60,7 @@ export default function AbacusGame({ level, onStars, onCelebrate }) {
       setFeedback({ good: true, text: pick(PRAISE) })
       setScore((s) => s + 1)
       onStars(1)
+      onRecord('abacusSolved', 1, 'inc')
       onCelebrate()
       setAnswer('')
       setTimeout(() => {

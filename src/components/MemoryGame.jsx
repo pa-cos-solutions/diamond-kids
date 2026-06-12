@@ -8,7 +8,7 @@ function makeNumber(len) {
   return s
 }
 
-export default function MemoryGame({ level, onStars, onCelebrate }) {
+export default function MemoryGame({ level, onStars, onCelebrate, onRecord = () => {} }) {
   const startLen = level.memory.start
   const [phase, setPhase] = useState('intro') // intro | show | recall | result
   const [length, setLength] = useState(startLen)
@@ -40,6 +40,7 @@ export default function MemoryGame({ level, onStars, onCelebrate }) {
       setBest((b) => Math.max(b, length))
       setLength(Math.min(newLen, 9))
       onStars(Math.max(1, length - startLen + 1))
+      onRecord('memoryBest', length, 'max')
       onCelebrate()
     } else {
       setLength(Math.max(startLen, length - 1))
