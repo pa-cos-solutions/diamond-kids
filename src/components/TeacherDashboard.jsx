@@ -225,7 +225,7 @@ export default function TeacherDashboard({
               </button>
             </div>
             <div className="worksheet">
-              <div className="worksheet-title">💎 Diamond Kids Academy — Fișă de exerciții</div>
+              <div className="worksheet-title">💎 SODO Kids Academy — Fișă de exerciții</div>
               <ol className="worksheet-grid">
                 {sheet.map((ex, i) => (
                   <li key={i} className="ws-item">

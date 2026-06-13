@@ -1,4 +1,4 @@
-# 💎 Diamond Kids
+# 💎 SODO Kids
 
 Aplicație web de aritmetică mentală pentru copii (5–12 ani).
 
