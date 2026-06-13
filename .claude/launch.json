@@ -6,6 +6,12 @@
       "runtimeExecutable": "/opt/homebrew/opt/node@22/bin/npm",
       "runtimeArgs": ["run", "dev"],
       "port": 5173
+    },
+    {
+      "name": "marcodp",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "4321", "--directory", "/Users/patigeorgiana/Desktop/marcodp-site"],
+      "port": 4321
     }
   ]
 }

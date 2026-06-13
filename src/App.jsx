@@ -93,6 +93,9 @@ export default function App() {
   return (
     <>
       <Confetti trigger={confettiBurst} />
+      {inGame && (
+        <img className="game-watermark" src="/logo.png" alt="SODO Kids Academy" />
+      )}
       <header className="header">
         {inGame && (
           <button className="back-btn" onClick={() => setScreen('home')}>

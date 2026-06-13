@@ -112,6 +112,34 @@ button {
 
 .back-btn:hover { transform: scale(1.05); }
 
+/* ---------- Siglă în colț (în timpul exercițiilor) ---------- */
+.game-watermark {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  width: 96px;
+  height: auto;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 20px;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(2px);
+  opacity: 0.85;
+  pointer-events: none;
+  z-index: 20;
+  animation: float 4s ease-in-out infinite;
+  transition: opacity 0.3s ease;
+}
+
+@media (max-width: 560px) {
+  .game-watermark {
+    width: 64px;
+    right: 10px;
+    bottom: 10px;
+    opacity: 0.7;
+  }
+}
+
 /* ---------- Home ---------- */
 .hero {
   text-align: center;
