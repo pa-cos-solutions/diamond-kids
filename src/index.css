@@ -746,6 +746,22 @@ button {
 .gen-group .option-label { display: block; margin-bottom: 6px; width: auto; }
 .gen-ops { display: flex; flex-wrap: wrap; gap: 8px; }
 
+.publish-row { margin-top: 12px; }
+.publish-row .name-input { max-width: 100%; width: 320px; }
+.publish-btns { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
+.publish-btns .big-btn { margin-top: 4px; }
+
+.set-list { display: flex; flex-direction: column; gap: 10px; }
+.set-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: #f1f7fd;
+}
+
 .worksheet-toolbar { display: flex; gap: 10px; flex-wrap: wrap; margin: 16px 0 8px; }
 .worksheet {
   border: 3px dashed #b9d7f0;

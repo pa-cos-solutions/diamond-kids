@@ -1,8 +1,9 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Fiecare utilizator (inclusiv anonim) are acces doar la propriile profiluri
-    match /users/{uid}/profiles/{profileId} {
+    // Fiecare utilizator (inclusiv anonim) are acces doar la propriile date:
+    // profiluri de elevi, seturi de exerciții publicate de profesor etc.
+    match /users/{uid}/{document=**} {
       allow read, write: if request.auth != null && request.auth.uid == uid;
     }
   }

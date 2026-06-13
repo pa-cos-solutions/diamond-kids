@@ -25,6 +25,7 @@ export function useProfiles() {
   const [user, setUser] = useState(null)
   const [profiles, setProfiles] = useState([])
   const [profilesReady, setProfilesReady] = useState(false)
+  const [exerciseSets, setExerciseSets] = useState([])
   const [activeId, setActiveId] = useState(() => localStorage.getItem(ACTIVE_KEY))
   const [error, setError] = useState(null)
 
@@ -54,6 +55,21 @@ export function useProfiles() {
         setError(e.code === 'permission-denied' ? 'permission-denied' : e.message)
         setProfilesReady(true)
       }
+    )
+    return unsub
+  }, [user])
+
+  // Seturile de exerciții publicate de profesor — vizibile imediat la elevi (realtime)
+  useEffect(() => {
+    if (!user) return
+    const unsub = onSnapshot(
+      collection(db, 'users', user.uid, 'exerciseSets'),
+      (snap) => {
+        const list = snap.docs.map((d) => ({ id: d.id, ...d.data() }))
+        list.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0))
+        setExerciseSets(list)
+      },
+      (e) => setError(e.message)
     )
     return unsub
   }, [user])
@@ -119,6 +135,20 @@ export function useProfiles() {
     }
   }
 
+  const createExerciseSet = async ({ title, ops, maxOperand, count }) => {
+    await addDoc(collection(db, 'users', user.uid, 'exerciseSets'), {
+      title,
+      ops,
+      maxOperand,
+      count,
+      createdAt: serverTimestamp(),
+    }).catch((e) => setError(e.message))
+  }
+
+  const deleteExerciseSet = async (id) => {
+    await deleteDoc(doc(db, 'users', user.uid, 'exerciseSets', id)).catch((e) => setError(e.message))
+  }
+
   const connectGoogle = async () => {
     const provider = new GoogleAuthProvider()
     try {
@@ -150,6 +180,9 @@ export function useProfiles() {
     deleteProfile,
     renameProfile,
     resetProfile,
+    exerciseSets,
+    createExerciseSet,
+    deleteExerciseSet,
     addStars,
     reportRecord,
     connectGoogle,

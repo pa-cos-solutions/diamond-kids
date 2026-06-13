@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { LEVELS } from './levels'
 import { useProfiles } from './useProfiles'
 import Home from './components/Home'
@@ -6,8 +6,10 @@ import AbacusGame from './components/AbacusGame'
 import FlashAnzan from './components/FlashAnzan'
 import Drills from './components/Drills'
 import MemoryGame from './components/MemoryGame'
+import CustomDrill from './components/CustomDrill'
 import ProfileScreen from './components/ProfileScreen'
 import TeacherDashboard from './components/TeacherDashboard'
+import TeacherGate from './components/TeacherGate'
 import Confetti from './components/Confetti'
 
 const GAMES = {
@@ -17,12 +19,29 @@ const GAMES = {
   memory: MemoryGame,
 }
 
+const TEACHER_ROUTE = '#/profesor'
+
 export default function App() {
   const [screen, setScreen] = useState('home')
   const [levelId, setLevelId] = useState(1)
   const [starBump, setStarBump] = useState(0)
   const [confettiBurst, setConfettiBurst] = useState(0)
-  const [teacherMode, setTeacherMode] = useState(false)
+  const [activeSet, setActiveSet] = useState(null)
+  const [route, setRoute] = useState(window.location.hash)
+  const [teacherUnlocked, setTeacherUnlocked] = useState(false)
+
+  // Rutare prin hash — zona de profesor stă la #/profesor, neaccesibilă din UI-ul elevilor
+  useEffect(() => {
+    const onHash = () => {
+      const h = window.location.hash
+      setRoute(h)
+      if (h !== TEACHER_ROUTE) setTeacherUnlocked(false)
+    }
+    window.addEventListener('hashchange', onHash)
+    return () => window.removeEventListener('hashchange', onHash)
+  }, [])
+
+  const isTeacherRoute = route === TEACHER_ROUTE
 
   const {
     user,
@@ -34,6 +53,9 @@ export default function App() {
     deleteProfile,
     renameProfile,
     resetProfile,
+    exerciseSets,
+    createExerciseSet,
+    deleteExerciseSet,
     addStars: addStarsDb,
     reportRecord,
     connectGoogle,
@@ -50,20 +72,31 @@ export default function App() {
 
   const celebrate = () => setConfettiBurst((c) => c + 1)
 
+  const goHome = () => {
+    if (window.location.hash) window.location.hash = ''
+    setScreen('home')
+  }
+
+  const playSet = (s) => {
+    setActiveSet(s)
+    setScreen('custom')
+  }
+
   const Game = GAMES[screen]
   const loading = !user || !profilesReady
   const needsProfile = !loading && !activeProfile
+  const inGame = !isTeacherRoute && !needsProfile && screen !== 'home'
 
   return (
     <>
       <Confetti trigger={confettiBurst} />
       <header className="header">
-        {screen !== 'home' && !needsProfile && (
+        {inGame && (
           <button className="back-btn" onClick={() => setScreen('home')}>
             ⬅ Înapoi
           </button>
         )}
-        <div className="logo" onClick={() => setScreen('home')}>
+        <div className="logo" onClick={goHome}>
           <span className="logo-icon">💎</span>
           <span>
             <span className="brand-diamond">Diamond</span> <span className="brand-kids">Kids</span>{' '}
@@ -71,12 +104,12 @@ export default function App() {
           </span>
         </div>
         <div className="header-spacer" />
-        {screen !== 'home' && !needsProfile && (
+        {inGame && GAMES[screen] && (
           <div className="level-pill">
             {level.emoji} {level.name}
           </div>
         )}
-        {activeProfile && (
+        {!isTeacherRoute && activeProfile && (
           <button
             className="profile-pill"
             title="Schimbă profilul"
@@ -85,7 +118,7 @@ export default function App() {
             {activeProfile.avatar} {activeProfile.name}
           </button>
         )}
-        {activeProfile && (
+        {!isTeacherRoute && activeProfile && (
           <div className={`stars-badge ${starBump ? 'bump' : ''}`} key={starBump}>
             ⭐ {activeProfile.stars || 0}
           </div>
@@ -96,14 +129,21 @@ export default function App() {
         <div className="loading-screen">
           <span className="logo-icon">💎</span> Se încarcă…
         </div>
-      ) : teacherMode ? (
-        <TeacherDashboard
-          profiles={profiles}
-          onRename={renameProfile}
-          onReset={resetProfile}
-          onDelete={deleteProfile}
-          onExit={() => setTeacherMode(false)}
-        />
+      ) : isTeacherRoute ? (
+        teacherUnlocked ? (
+          <TeacherDashboard
+            profiles={profiles}
+            onRename={renameProfile}
+            onReset={resetProfile}
+            onDelete={deleteProfile}
+            sets={exerciseSets}
+            onCreateSet={createExerciseSet}
+            onDeleteSet={deleteExerciseSet}
+            onExit={goHome}
+          />
+        ) : (
+          <TeacherGate onUnlock={() => setTeacherUnlocked(true)} onExit={goHome} />
+        )
       ) : needsProfile ? (
         <ProfileScreen
           user={user}
@@ -116,11 +156,23 @@ export default function App() {
           onDelete={deleteProfile}
           onConnectGoogle={connectGoogle}
           onSignOut={signOutUser}
-          onTeacher={() => setTeacherMode(true)}
           error={error}
         />
       ) : screen === 'home' ? (
-        <Home level={level} onSelectLevel={setLevelId} onSelectGame={setScreen} />
+        <Home
+          level={level}
+          onSelectLevel={setLevelId}
+          onSelectGame={setScreen}
+          sets={exerciseSets}
+          onSelectSet={playSet}
+        />
+      ) : screen === 'custom' && activeSet ? (
+        <CustomDrill
+          set={activeSet}
+          onStars={addStars}
+          onCelebrate={celebrate}
+          onRecord={reportRecord}
+        />
       ) : (
         <Game level={level} onStars={addStars} onCelebrate={celebrate} onRecord={reportRecord} />
       )}

@@ -31,7 +31,7 @@ const GAMES = [
   },
 ]
 
-export default function Home({ level, onSelectLevel, onSelectGame }) {
+export default function Home({ level, onSelectLevel, onSelectGame, sets = [], onSelectSet }) {
   return (
     <main>
       <div className="hero">
@@ -70,6 +70,28 @@ export default function Home({ level, onSelectLevel, onSelectGame }) {
           </button>
         ))}
       </div>
+
+      {sets.length > 0 && (
+        <>
+          <div className="section-label">📘 Exerciții de la profesor:</div>
+          <div className="game-grid">
+            {sets.map((s) => (
+              <button
+                key={s.id}
+                className="game-card"
+                style={{ borderBottomColor: 'var(--purple)' }}
+                onClick={() => onSelectSet(s)}
+              >
+                <span className="game-emoji">📘</span>
+                <h3>{s.title}</h3>
+                <p>
+                  {s.count} exerciții · {s.ops.join(' ')} · până la {s.maxOperand}
+                </p>
+              </button>
+            ))}
+          </div>
+        </>
+      )}
     </main>
   )
 }

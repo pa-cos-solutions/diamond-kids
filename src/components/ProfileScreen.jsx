@@ -10,7 +10,6 @@ export default function ProfileScreen({
   onDelete,
   onConnectGoogle,
   onSignOut,
-  onTeacher,
   error,
 }) {
   const [name, setName] = useState('')
@@ -94,10 +93,6 @@ export default function ProfileScreen({
           </button>
         </div>
       </div>
-
-      <button className="teacher-entry" onClick={onTeacher}>
-        👩‍🏫 Sunt profesor — administrează profilurile și generează exerciții
-      </button>
 
       <div className="account-box">
         {isGoogle ? (

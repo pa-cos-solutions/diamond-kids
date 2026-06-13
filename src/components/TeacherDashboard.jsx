@@ -13,12 +13,28 @@ const ALL_OPS = ['+', '-', '×', '÷']
 const MAX_CHOICES = [10, 20, 50, 100, 1000]
 const COUNT_CHOICES = [10, 20, 30, 40]
 
-export default function TeacherDashboard({ profiles, onRename, onReset, onDelete, onExit }) {
+export default function TeacherDashboard({
+  profiles,
+  onRename,
+  onReset,
+  onDelete,
+  sets = [],
+  onCreateSet,
+  onDeleteSet,
+  onExit,
+}) {
   const [ops, setOps] = useState(['+', '-'])
   const [maxOperand, setMaxOperand] = useState(20)
   const [count, setCount] = useState(20)
   const [sheet, setSheet] = useState(null)
   const [showAnswers, setShowAnswers] = useState(false)
+  const [title, setTitle] = useState('')
+
+  const publish = () => {
+    const t = title.trim() || `Exerciții: ${ops.join(' ')} · până la ${maxOperand}`
+    onCreateSet({ title: t, ops: [...ops], maxOperand, count })
+    setTitle('')
+  }
 
   const toggleOp = (op) =>
     setOps((cur) =>
@@ -155,9 +171,27 @@ export default function TeacherDashboard({ profiles, onRename, onReset, onDelete
           </div>
         </div>
 
-        <button className="big-btn blue" onClick={generate}>
-          Generează 🧮
-        </button>
+        <div className="publish-row">
+          <input
+            className="name-input"
+            placeholder="Nume set (ex: Adunări până la 20)"
+            maxLength={40}
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && publish()}
+          />
+          <div className="publish-btns">
+            <button className="big-btn blue" onClick={generate}>
+              Previzualizează 🧮
+            </button>
+            <button className="big-btn" onClick={publish}>
+              📤 Publică pentru elevi
+            </button>
+          </div>
+          <p className="muted" style={{ fontSize: 14, margin: '4px 0 0' }}>
+            Setul publicat apare imediat la elevi, în secțiunea „Exerciții de la profesor".
+          </p>
+        </div>
 
         {sheet && (
           <>
@@ -183,6 +217,41 @@ export default function TeacherDashboard({ profiles, onRename, onReset, onDelete
               </ol>
             </div>
           </>
+        )}
+      </div>
+
+      {/* ---- Seturi publicate ---- */}
+      <div className="game-screen" style={{ textAlign: 'left', marginTop: 16 }}>
+        <h3 className="teacher-h3">
+          📤 Publicate pentru elevi <span className="muted">({sets.length})</span>
+        </h3>
+        {sets.length === 0 ? (
+          <p className="muted">
+            Niciun set publicat încă. Configurează mai sus și apasă „Publică pentru elevi".
+          </p>
+        ) : (
+          <div className="set-list">
+            {sets.map((s) => (
+              <div key={s.id} className="set-item">
+                <div>
+                  <strong>{s.title}</strong>
+                  <div className="muted" style={{ fontSize: 14 }}>
+                    {s.count} exerciții · {s.ops.join(' ')} · până la {s.maxOperand}
+                  </div>
+                </div>
+                <button
+                  className="mini-btn danger"
+                  title="Șterge setul"
+                  onClick={() => {
+                    if (window.confirm(`Ștergi setul „${s.title}"? Nu va mai fi disponibil la elevi.`))
+                      onDeleteSet(s.id)
+                  }}
+                >
+                  🗑️
+                </button>
+              </div>
+            ))}
+          </div>
         )}
       </div>
     </div>
