@@ -7,6 +7,7 @@ import FlashAnzan from './components/FlashAnzan'
 import Drills from './components/Drills'
 import MemoryGame from './components/MemoryGame'
 import ProfileScreen from './components/ProfileScreen'
+import TeacherDashboard from './components/TeacherDashboard'
 import Confetti from './components/Confetti'
 
 const GAMES = {
@@ -21,6 +22,7 @@ export default function App() {
   const [levelId, setLevelId] = useState(1)
   const [starBump, setStarBump] = useState(0)
   const [confettiBurst, setConfettiBurst] = useState(0)
+  const [teacherMode, setTeacherMode] = useState(false)
 
   const {
     user,
@@ -30,6 +32,8 @@ export default function App() {
     selectProfile,
     createProfile,
     deleteProfile,
+    renameProfile,
+    resetProfile,
     addStars: addStarsDb,
     reportRecord,
     connectGoogle,
@@ -62,7 +66,8 @@ export default function App() {
         <div className="logo" onClick={() => setScreen('home')}>
           <span className="logo-icon">💎</span>
           <span>
-            <span className="brand-diamond">Diamond</span> <span className="brand-kids">Kids</span>
+            <span className="brand-diamond">Diamond</span> <span className="brand-kids">Kids</span>{' '}
+            <span className="brand-academy">Academy</span>
           </span>
         </div>
         <div className="header-spacer" />
@@ -91,6 +96,14 @@ export default function App() {
         <div className="loading-screen">
           <span className="logo-icon">💎</span> Se încarcă…
         </div>
+      ) : teacherMode ? (
+        <TeacherDashboard
+          profiles={profiles}
+          onRename={renameProfile}
+          onReset={resetProfile}
+          onDelete={deleteProfile}
+          onExit={() => setTeacherMode(false)}
+        />
       ) : needsProfile ? (
         <ProfileScreen
           user={user}
@@ -103,6 +116,7 @@ export default function App() {
           onDelete={deleteProfile}
           onConnectGoogle={connectGoogle}
           onSignOut={signOutUser}
+          onTeacher={() => setTeacherMode(true)}
           error={error}
         />
       ) : screen === 'home' ? (

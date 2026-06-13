@@ -85,6 +85,23 @@ export function useProfiles() {
     if (id === activeId) selectProfile(null)
   }
 
+  // gestionate de profesor — funcționează pe orice profil al contului
+  const renameProfile = async (id, name) => {
+    await updateDoc(doc(db, 'users', user.uid, 'profiles', id), { name }).catch((e) =>
+      setError(e.message)
+    )
+  }
+
+  const resetProfile = async (id) => {
+    await updateDoc(doc(db, 'users', user.uid, 'profiles', id), {
+      stars: 0,
+      memoryBest: 0,
+      flashWins: 0,
+      drillsBestCorrect: 0,
+      abacusSolved: 0,
+    }).catch((e) => setError(e.message))
+  }
+
   const profileRef = () => doc(db, 'users', user.uid, 'profiles', activeId)
 
   const addStars = (n) => {
@@ -131,6 +148,8 @@ export function useProfiles() {
     selectProfile,
     createProfile,
     deleteProfile,
+    renameProfile,
+    resetProfile,
     addStars,
     reportRecord,
     connectGoogle,

@@ -35,7 +35,7 @@ export default function Home({ level, onSelectLevel, onSelectGame }) {
   return (
     <main>
       <div className="hero">
-        <h1>Bun venit la Diamond Kids! 👋</h1>
+        <h1>Bun venit la Diamond Kids Academy! 👋</h1>
         <p>Antrenează-ți mintea cu jocuri de aritmetică mentală!</p>
       </div>
 

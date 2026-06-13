@@ -69,6 +69,7 @@ button {
 
 .logo .brand-diamond { color: var(--blue); }
 .logo .brand-kids { color: var(--orange); }
+.logo .brand-academy { color: var(--purple); }
 
 .header-spacer { flex: 1; }
 
@@ -682,6 +683,103 @@ button {
 }
 
 .loading-screen .logo-icon { font-size: 40px; }
+
+/* ---------- Teacher dashboard ---------- */
+.teacher-entry {
+  display: block;
+  width: 100%;
+  margin-top: 14px;
+  padding: 14px 18px;
+  border-radius: 18px;
+  background: #f3e8ff;
+  color: #7e22ce;
+  font-weight: 800;
+  font-size: 16px;
+  box-shadow: var(--shadow);
+  transition: transform 0.15s ease;
+}
+.teacher-entry:hover { transform: scale(1.02); }
+
+.teacher-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.teacher-h3 { font-size: 20px; font-weight: 800; margin: 0 0 12px; }
+.muted { color: var(--ink-soft); font-weight: 600; }
+
+.teacher-table-wrap { overflow-x: auto; }
+.teacher-table { width: 100%; border-collapse: collapse; font-weight: 600; }
+.teacher-table th,
+.teacher-table td {
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 2px solid #eef4fb;
+  white-space: nowrap;
+}
+.teacher-table th {
+  font-size: 12px;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.teacher-table td.num { text-align: center; font-weight: 800; color: var(--ink); }
+.elev-cell { font-weight: 800; }
+.elev-avatar { font-size: 24px; vertical-align: middle; margin-right: 4px; }
+
+.actions-cell { display: flex; gap: 6px; }
+.mini-btn {
+  font-size: 18px;
+  padding: 6px 10px;
+  border-radius: 12px;
+  background: #eef4fb;
+  box-shadow: 0 3px 0 #d3e2f1;
+  transition: transform 0.1s ease;
+}
+.mini-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 #d3e2f1; }
+.mini-btn.danger { background: #fee2e2; box-shadow: 0 3px 0 #fbc7c7; }
+
+.gen-controls { display: flex; flex-direction: column; gap: 14px; margin-bottom: 8px; }
+.gen-group .option-label { display: block; margin-bottom: 6px; width: auto; }
+.gen-ops { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.worksheet-toolbar { display: flex; gap: 10px; flex-wrap: wrap; margin: 16px 0 8px; }
+.worksheet {
+  border: 3px dashed #b9d7f0;
+  border-radius: 18px;
+  padding: 18px;
+  margin-top: 8px;
+}
+.worksheet-title { font-size: 18px; font-weight: 800; text-align: center; margin-bottom: 14px; }
+.worksheet-grid {
+  list-style: decimal inside;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px 18px;
+  margin: 0;
+  padding: 0;
+}
+.ws-item { font-size: 18px; font-weight: 700; }
+.ws-q { margin: 0 4px; }
+.ws-a {
+  display: inline-block;
+  min-width: 42px;
+  border-bottom: 2px solid var(--ink);
+  color: var(--green);
+  font-weight: 800;
+  text-align: center;
+}
+.ws-a.filled { border-bottom-color: transparent; }
+
+@media print {
+  body { background: #fff; }
+  body * { visibility: hidden; }
+  .worksheet, .worksheet * { visibility: visible; }
+  .worksheet { position: absolute; left: 0; top: 0; width: 100%; border: none; padding: 0; }
+}
 
 /* ---------- Confetti ---------- */
 .confetti-layer {

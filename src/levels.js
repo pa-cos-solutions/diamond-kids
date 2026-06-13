@@ -101,6 +101,42 @@ export function makeQuestion(level, ops) {
   return { a, b, op, answer, text: `${a} ${op} ${b}` }
 }
 
+// Generator configurabil pentru profesor — exerciții „noi" după parametri liberi
+export function makeCustomExercise({ ops, maxOperand }) {
+  const op = pick(ops)
+  const factorMax = Math.min(maxOperand, 12) // ×/÷ rămân rezonabile pentru copii
+  let a, b, answer
+  switch (op) {
+    case '+':
+      a = rand(1, maxOperand); b = rand(1, maxOperand); answer = a + b; break
+    case '-':
+      a = rand(1, maxOperand); b = rand(0, a); answer = a - b; break
+    case '×':
+      a = rand(1, factorMax); b = rand(1, factorMax); answer = a * b; break
+    case '÷': {
+      b = rand(2, factorMax); answer = rand(1, factorMax); a = b * answer; break
+    }
+    default:
+      a = 1; b = 1; answer = 2
+  }
+  return { text: `${a} ${op} ${b}`, answer }
+}
+
+// Construiește o fișă de `count` exerciții, evitând duplicatele
+export function generateWorksheet({ ops, maxOperand, count }) {
+  const out = []
+  const seen = new Set()
+  let guard = 0
+  while (out.length < count && guard < count * 40) {
+    guard++
+    const ex = makeCustomExercise({ ops, maxOperand })
+    if (seen.has(ex.text)) continue
+    seen.add(ex.text)
+    out.push(ex)
+  }
+  return out
+}
+
 export function makeFlashSequence(level, count) {
   const { min, max, neg } = level.flash
   const numbers = []
