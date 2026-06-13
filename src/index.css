@@ -67,6 +67,12 @@ button {
   display: inline-block;
 }
 
+.logo img.logo-icon {
+  height: 46px;
+  width: auto;
+  border-radius: 10px;
+}
+
 .logo .brand-SODO { color: var(--blue); }
 .logo .brand-kids { color: var(--orange); }
 .logo .brand-academy { color: var(--purple); }
@@ -117,14 +123,14 @@ button {
   position: fixed;
   right: 18px;
   bottom: 18px;
-  width: 96px;
+  width: 70px;
   height: auto;
-  padding: 8px;
-  background: rgba(255, 255, 255, 0.7);
-  border-radius: 20px;
-  box-shadow: var(--shadow);
-  backdrop-filter: blur(2px);
-  opacity: 0.85;
+  padding: 5px;
+  background: #ffffff;
+  border: 3px solid var(--yellow);
+  border-radius: 22px;
+  box-shadow: 0 10px 26px rgba(30, 58, 95, 0.22);
+  opacity: 0.95;
   pointer-events: none;
   z-index: 20;
   animation: float 4s ease-in-out infinite;
