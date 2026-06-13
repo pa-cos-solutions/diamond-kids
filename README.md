@@ -1,4 +1,4 @@
-# 💎 SODO Kids
+# 💎 SODO Kids Academy
 
 Aplicație web de aritmetică mentală pentru copii (5–12 ani).
 
