@@ -52,7 +52,7 @@ export default function Home({
   return (
     <main>
       <div className="hero">
-        <h1>Bun venit la SODO Kids Academy! 👋</h1>
+        <h1>Bun venit la SODO! 👋</h1>
         <p>Antrenează-ți mintea cu jocuri de aritmetică mentală!</p>
       </div>
 

@@ -1,11 +1,10 @@
 import { useState } from 'react'
-
-const PIN_KEY = 'dk-teacher-pin'
+import { getPin, setPin as savePin } from '../teacherPin'
 
 // Poartă cu PIN pentru zona de profesor — elevii nu pot intra fără el.
 // PIN-ul e setat la prima accesare și păstrat local pe acest dispozitiv.
 export default function TeacherGate({ onUnlock, onExit }) {
-  const storedPin = localStorage.getItem(PIN_KEY)
+  const storedPin = getPin()
   const [pin, setPin] = useState('')
   const [err, setErr] = useState('')
 
@@ -19,7 +18,7 @@ export default function TeacherGate({ onUnlock, onExit }) {
       if (value === storedPin) onUnlock()
       else setErr('PIN greșit. Mai încearcă.')
     } else {
-      localStorage.setItem(PIN_KEY, value)
+      savePin(value)
       onUnlock()
     }
   }

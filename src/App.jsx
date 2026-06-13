@@ -102,8 +102,7 @@ export default function App() {
         <div className="logo" onClick={goHome}>
           <span className="logo-icon">💎</span>
           <span>
-            <span className="brand-SODO">SODO</span> <span className="brand-kids">Kids</span>{' '}
-            <span className="brand-academy">Academy</span>
+            <span className="brand-SODO">SODO</span>
           </span>
         </div>
         <div className="header-spacer" />

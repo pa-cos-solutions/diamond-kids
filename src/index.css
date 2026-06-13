@@ -68,8 +68,6 @@ button {
 }
 
 .logo .brand-SODO { color: var(--blue); }
-.logo .brand-kids { color: var(--orange); }
-.logo .brand-academy { color: var(--purple); }
 
 .header-spacer { flex: 1; }
 
@@ -750,6 +748,10 @@ button {
 .publish-row .name-input { max-width: 100%; width: 320px; }
 .publish-btns { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
 .publish-btns .big-btn { margin-top: 4px; }
+
+.pin-change-form { display: flex; flex-direction: column; gap: 10px; max-width: 320px; }
+.pin-change-form .name-input { width: 100%; max-width: 100%; }
+.pin-change-form .big-btn { margin-top: 4px; }
 
 .set-list { display: flex; flex-direction: column; gap: 10px; }
 .set-item {
