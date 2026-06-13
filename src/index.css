@@ -68,6 +68,7 @@ button {
 }
 
 .logo .brand-SODO { color: var(--blue); }
+.logo .brand-kids { color: var(--orange); }
 
 .header-spacer { flex: 1; }
 
