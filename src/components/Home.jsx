@@ -1,4 +1,4 @@
-import { LEVELS } from '../levels'
+import { LEVELS, BADGES, dayKey } from '../levels'
 
 const GAMES = [
   {
@@ -31,12 +31,62 @@ const GAMES = [
   },
 ]
 
-export default function Home({ level, onSelectLevel, onSelectGame, sets = [], onSelectSet }) {
+const DAILY_GOAL = 10
+
+export default function Home({
+  level,
+  profile,
+  profiles = [],
+  onSelectLevel,
+  onSelectGame,
+  onStartPlacement,
+  sets = [],
+  onSelectSet,
+}) {
+  const today = dayKey()
+  const dailyDone = profile?.dailyDate === today ? profile.dailyCount || 0 : 0
+  const dailyPct = Math.min(100, Math.round((dailyDone / DAILY_GOAL) * 100))
+  const badgeCount = (profile?.badges || []).length
+  const ranked = [...profiles].sort((a, b) => (b.stars || 0) - (a.stars || 0))
+
   return (
     <main>
       <div className="hero">
         <h1>Bun venit la Diamond Kids Academy! 👋</h1>
         <p>Antrenează-ți mintea cu jocuri de aritmetică mentală!</p>
+      </div>
+
+      {/* Antrenament zilnic + statistici */}
+      <div className="today-card">
+        <div className="today-stats">
+          <div className="today-stat">
+            <span className="today-emoji">🔥</span>
+            <strong>{profile?.streak || 0}</strong>
+            <span className="today-label">zile la rând</span>
+          </div>
+          <div className="today-stat">
+            <span className="today-emoji">🪙</span>
+            <strong>{profile?.coins || 0}</strong>
+            <span className="today-label">monede</span>
+          </div>
+          <div className="today-stat">
+            <span className="today-emoji">🏅</span>
+            <strong>{badgeCount}</strong>
+            <span className="today-label">insigne</span>
+          </div>
+        </div>
+        <div className="goal-box">
+          <div className="goal-head">
+            🎯 Antrenament zilnic: <strong>{dailyDone}/{DAILY_GOAL}</strong>
+            {dailyDone >= DAILY_GOAL && <span className="goal-done"> ✓ gata pe azi!</span>}
+          </div>
+          <div className="goal-bar">
+            <div className="goal-fill" style={{ width: `${dailyPct}%` }} />
+          </div>
+        </div>
+        <button className="goal-test-btn" onClick={onStartPlacement}>
+          🎯 Test de nivel
+        </button>
       </div>
 
       <div className="section-label">1️⃣ Alege nivelul tău:</div>
@@ -49,7 +99,9 @@ export default function Home({ level, onSelectLevel, onSelectGame, sets = [], on
             onClick={() => onSelectLevel(l.id)}
           >
             <span className="chip-emoji">{l.emoji}</span>
-            <span className="chip-name" style={{ color: 'var(--ink)' }}>{l.name}</span>
+            <span className="chip-name" style={{ color: 'var(--ink)' }}>
+              {l.name}
+            </span>
             <span className="chip-age">{l.age}</span>
           </button>
         ))}
@@ -88,6 +140,38 @@ export default function Home({ level, onSelectLevel, onSelectGame, sets = [], on
                   {s.count} exerciții · {s.ops.join(' ')} · până la {s.maxOperand}
                 </p>
               </button>
+            ))}
+          </div>
+        </>
+      )}
+
+      {/* Insigne câștigate */}
+      {badgeCount > 0 && (
+        <>
+          <div className="section-label">🏅 Insignele tale:</div>
+          <div className="badge-row">
+            {BADGES.filter((b) => (profile?.badges || []).includes(b.id)).map((b) => (
+              <div key={b.id} className="badge-chip" title={b.name}>
+                <span className="badge-icon">{b.icon}</span>
+                <span className="badge-name">{b.name}</span>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+
+      {/* Clasament între profilurile contului */}
+      {ranked.length > 1 && (
+        <>
+          <div className="section-label">🏆 Clasament:</div>
+          <div className="leaderboard">
+            {ranked.map((p, i) => (
+              <div key={p.id} className={`lb-row ${p.id === profile?.id ? 'me' : ''}`}>
+                <span className="lb-rank">{i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : i + 1}</span>
+                <span className="lb-avatar">{p.avatar}</span>
+                <span className="lb-name">{p.name}</span>
+                <span className="lb-xp">⭐ {p.stars || 0}</span>
+              </div>
             ))}
           </div>
         </>

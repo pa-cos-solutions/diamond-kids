@@ -1,10 +1,12 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import NumberPad from './NumberPad'
-import { makeCustomExercise, pick, PRAISE, ENCOURAGE } from '../levels'
+import { makeCustomExercise, pick, PRAISE, ENCOURAGE, explain } from '../levels'
 
 // Joc pentru elevi: rezolvă un set de exerciții publicat de profesor
-export default function CustomDrill({ set, onStars, onCelebrate, onRecord = () => {} }) {
+export default function CustomDrill({ set, onStars, onCelebrate, onRecord = () => {}, onSession = () => {} }) {
   const total = set.count
+  const tally = useRef({})
+  const startedAt = useRef(0)
   const [phase, setPhase] = useState('intro') // intro | play | summary
   const [question, setQuestion] = useState(null)
   const [qIndex, setQIndex] = useState(0)
@@ -21,12 +23,18 @@ export default function CustomDrill({ set, onStars, onCelebrate, onRecord = () =
     setStreak(0)
     setAnswer('')
     setFeedback(null)
+    tally.current = {}
+    startedAt.current = Date.now()
     setQuestion(nextQuestion())
     setPhase('play')
   }
 
   const check = (n) => {
     const good = n === question.answer
+    const t = tally.current[question.op] || { c: 0, a: 0 }
+    t.a += 1
+    if (good) t.c += 1
+    tally.current[question.op] = t
     if (good) {
       setCorrect((c) => c + 1)
       setStreak((s) => s + 1)
@@ -35,7 +43,10 @@ export default function CustomDrill({ set, onStars, onCelebrate, onRecord = () =
       if ((streak + 1) % 5 === 0) onCelebrate()
     } else {
       setStreak(0)
-      setFeedback({ good: false, text: `${pick(ENCOURAGE)} Corect era ${question.answer}.` })
+      setFeedback({
+        good: false,
+        text: `${pick(ENCOURAGE)} ${explain(question.a, question.op, question.b, question.answer)}`,
+      })
     }
     setAnswer('')
 
@@ -46,8 +57,17 @@ export default function CustomDrill({ set, onStars, onCelebrate, onRecord = () =
         if (ni >= total) {
           setPhase('summary')
           const finalCorrect = correct + (good ? 1 : 0)
+          const perfect = finalCorrect === total
           onRecord('drillsBestCorrect', finalCorrect, 'max')
-          if (finalCorrect === total) {
+          onSession({
+            correct: finalCorrect,
+            attempts: total,
+            ops: tally.current,
+            seconds: Math.round((Date.now() - startedAt.current) / 1000),
+            coins: finalCorrect + (perfect ? 10 : 0),
+            perfect,
+          })
+          if (perfect) {
             onStars(5)
             onCelebrate()
           }
@@ -56,7 +76,7 @@ export default function CustomDrill({ set, onStars, onCelebrate, onRecord = () =
           setQuestion(nextQuestion())
         }
       },
-      good ? 900 : 1800
+      good ? 900 : 2600
     )
   }
 

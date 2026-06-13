@@ -1,13 +1,27 @@
 import { useState } from 'react'
 import { generateWorksheet, OP_NAMES } from '../levels'
 
-const STAT_COLUMNS = [
-  { key: 'stars', label: '⭐ Stele' },
-  { key: 'drillsBestCorrect', label: '⏱️ Record exerciții' },
-  { key: 'flashWins', label: '⚡ Flash' },
-  { key: 'memoryBest', label: '🧠 Memorie' },
-  { key: 'abacusSolved', label: '🧮 Abac' },
-]
+const OP_LABEL = { '+': 'adunare', '-': 'scădere', '×': 'înmulțire', '÷': 'împărțire' }
+
+function accuracy(p) {
+  const a = p.totalAttempts || 0
+  return a ? Math.round(((p.totalCorrect || 0) / a) * 100) : null
+}
+
+function weakSpot(p) {
+  const s = p.opStats || {}
+  let worst = null
+  let worstPct = 1.01
+  for (const [op, v] of Object.entries(s)) {
+    if ((v.a || 0) < 3) continue
+    const pct = v.c / v.a
+    if (pct < worstPct) {
+      worstPct = pct
+      worst = op
+    }
+  }
+  return worst ? `${worst} ${OP_LABEL[worst]} (${Math.round(worstPct * 100)}%)` : '—'
+}
 
 const ALL_OPS = ['+', '-', '×', '÷']
 const MAX_CHOICES = [10, 20, 50, 100, 1000]
@@ -84,38 +98,45 @@ export default function TeacherDashboard({
               <thead>
                 <tr>
                   <th>Elev</th>
-                  {STAT_COLUMNS.map((c) => (
-                    <th key={c.key}>{c.label}</th>
-                  ))}
+                  <th>⭐ Stele</th>
+                  <th>🪙 Monede</th>
+                  <th>🔥 Serie</th>
+                  <th>🎯 Precizie</th>
+                  <th>📉 Punct slab</th>
+                  <th>⏱️ Timp</th>
                   <th>Acțiuni</th>
                 </tr>
               </thead>
               <tbody>
-                {profiles.map((p) => (
-                  <tr key={p.id}>
-                    <td className="elev-cell">
-                      <span className="elev-avatar">{p.avatar}</span> {p.name}
-                    </td>
-                    {STAT_COLUMNS.map((c) => (
-                      <td key={c.key} className="num">
-                        {p[c.key] || 0}
+                {profiles.map((p) => {
+                  const acc = accuracy(p)
+                  return (
+                    <tr key={p.id}>
+                      <td className="elev-cell">
+                        <span className="elev-avatar">{p.avatar}</span> {p.name}
                       </td>
-                    ))}
-                    <td>
-                      <div className="actions-cell">
-                        <button className="mini-btn" title="Redenumește" onClick={() => rename(p)}>
-                          ✏️
-                        </button>
-                        <button className="mini-btn" title="Resetează progresul" onClick={() => reset(p)}>
-                          ↺
-                        </button>
-                        <button className="mini-btn danger" title="Șterge" onClick={() => remove(p)}>
-                          🗑️
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                      <td className="num">{p.stars || 0}</td>
+                      <td className="num">{p.coins || 0}</td>
+                      <td className="num">{p.streak || 0}</td>
+                      <td className="num">{acc === null ? '—' : `${acc}%`}</td>
+                      <td>{weakSpot(p)}</td>
+                      <td className="num">{Math.round((p.weekSeconds || 0) / 60)} min</td>
+                      <td>
+                        <div className="actions-cell">
+                          <button className="mini-btn" title="Redenumește" onClick={() => rename(p)}>
+                            ✏️
+                          </button>
+                          <button className="mini-btn" title="Resetează progresul" onClick={() => reset(p)}>
+                            ↺
+                          </button>
+                          <button className="mini-btn danger" title="Șterge" onClick={() => remove(p)}>
+                            🗑️
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                })}
               </tbody>
             </table>
           </div>

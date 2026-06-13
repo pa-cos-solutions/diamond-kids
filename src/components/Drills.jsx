@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import NumberPad from './NumberPad'
-import { makeQuestion, OP_NAMES, pick, PRAISE, ENCOURAGE } from '../levels'
+import { makeQuestion, OP_NAMES, pick, PRAISE, ENCOURAGE, explain } from '../levels'
 
 const ROUND_SIZE = 10
 
-export default function Drills({ level, onStars, onCelebrate, onRecord = () => {} }) {
+export default function Drills({ level, onStars, onCelebrate, onRecord = () => {}, onSession = () => {} }) {
   const allOps = level.drill.ops
   const [selectedOps, setSelectedOps] = useState(allOps)
   const [phase, setPhase] = useState('config') // config | play | summary
@@ -16,6 +16,7 @@ export default function Drills({ level, onStars, onCelebrate, onRecord = () => {
   const [feedback, setFeedback] = useState(null)
   const [elapsed, setElapsed] = useState(0)
   const timerRef = useRef(null)
+  const tally = useRef({})
 
   // selecția de operații se resetează când se schimbă nivelul
   useEffect(() => setSelectedOps(level.drill.ops), [level])
@@ -35,6 +36,7 @@ export default function Drills({ level, onStars, onCelebrate, onRecord = () => {
     setElapsed(0)
     setAnswer('')
     setFeedback(null)
+    tally.current = {}
     setQuestion(makeQuestion(level, selectedOps))
     setPhase('play')
     clearInterval(timerRef.current)
@@ -43,6 +45,10 @@ export default function Drills({ level, onStars, onCelebrate, onRecord = () => {
 
   const check = (n) => {
     const good = n === question.answer
+    const t = tally.current[question.op] || { c: 0, a: 0 }
+    t.a += 1
+    if (good) t.c += 1
+    tally.current[question.op] = t
     if (good) {
       setCorrect((c) => c + 1)
       setStreak((s) => s + 1)
@@ -51,7 +57,10 @@ export default function Drills({ level, onStars, onCelebrate, onRecord = () => {
       if ((streak + 1) % 5 === 0) onCelebrate()
     } else {
       setStreak(0)
-      setFeedback({ good: false, text: `${pick(ENCOURAGE)} Corect era ${question.answer}.` })
+      setFeedback({
+        good: false,
+        text: `${pick(ENCOURAGE)} ${explain(question.a, question.op, question.b, question.answer)}`,
+      })
     }
     setAnswer('')
 
@@ -62,8 +71,17 @@ export default function Drills({ level, onStars, onCelebrate, onRecord = () => {
         clearInterval(timerRef.current)
         setPhase('summary')
         const finalCorrect = correct + (good ? 1 : 0)
+        const perfect = finalCorrect === ROUND_SIZE
         onRecord('drillsBestCorrect', finalCorrect, 'max')
-        if (finalCorrect === ROUND_SIZE) {
+        onSession({
+          correct: finalCorrect,
+          attempts: ROUND_SIZE,
+          ops: tally.current,
+          seconds: elapsed,
+          coins: finalCorrect + (perfect ? 10 : 0),
+          perfect,
+        })
+        if (perfect) {
           onStars(5) // bonus pentru rundă perfectă
           onCelebrate()
         }
@@ -71,7 +89,7 @@ export default function Drills({ level, onStars, onCelebrate, onRecord = () => {
         setQIndex(next)
         setQuestion(makeQuestion(level, selectedOps))
       }
-    }, good ? 900 : 1800)
+    }, good ? 900 : 2600)
   }
 
   const finalCorrect = correct

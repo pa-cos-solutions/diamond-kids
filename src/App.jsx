@@ -7,6 +7,7 @@ import FlashAnzan from './components/FlashAnzan'
 import Drills from './components/Drills'
 import MemoryGame from './components/MemoryGame'
 import CustomDrill from './components/CustomDrill'
+import Placement from './components/Placement'
 import ProfileScreen from './components/ProfileScreen'
 import TeacherDashboard from './components/TeacherDashboard'
 import TeacherGate from './components/TeacherGate'
@@ -58,6 +59,8 @@ export default function App() {
     deleteExerciseSet,
     addStars: addStarsDb,
     reportRecord,
+    reportSession,
+    setProfileLevel,
     connectGoogle,
     signOutUser,
     error,
@@ -123,6 +126,9 @@ export default function App() {
             ⭐ {activeProfile.stars || 0}
           </div>
         )}
+        {!isTeacherRoute && activeProfile && (
+          <div className="coins-badge">🪙 {activeProfile.coins || 0}</div>
+        )}
       </header>
 
       {loading ? (
@@ -158,11 +164,23 @@ export default function App() {
           onSignOut={signOutUser}
           error={error}
         />
+      ) : screen === 'placement' ? (
+        <Placement
+          onDone={(lid) => {
+            setProfileLevel(lid)
+            setLevelId(lid)
+            setScreen('home')
+          }}
+          onCancel={() => setScreen('home')}
+        />
       ) : screen === 'home' ? (
         <Home
           level={level}
+          profile={activeProfile}
+          profiles={profiles}
           onSelectLevel={setLevelId}
           onSelectGame={setScreen}
+          onStartPlacement={() => setScreen('placement')}
           sets={exerciseSets}
           onSelectSet={playSet}
         />
@@ -172,9 +190,16 @@ export default function App() {
           onStars={addStars}
           onCelebrate={celebrate}
           onRecord={reportRecord}
+          onSession={reportSession}
         />
       ) : (
-        <Game level={level} onStars={addStars} onCelebrate={celebrate} onRecord={reportRecord} />
+        <Game
+          level={level}
+          onStars={addStars}
+          onCelebrate={celebrate}
+          onRecord={reportRecord}
+          onSession={reportSession}
+        />
       )}
     </>
   )

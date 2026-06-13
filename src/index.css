@@ -797,6 +797,84 @@ button {
   .worksheet { position: absolute; left: 0; top: 0; width: 100%; border: none; padding: 0; }
 }
 
+/* ---------- Coins / daily / badges / leaderboard ---------- */
+.coins-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #fde68a;
+  color: #7c5800;
+  font-weight: 800;
+  font-size: 18px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  box-shadow: var(--shadow);
+}
+
+.today-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 16px 20px;
+  margin: 0 0 18px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+}
+.today-stats { display: flex; gap: 18px; }
+.today-stat { display: flex; flex-direction: column; align-items: center; min-width: 64px; }
+.today-stat .today-emoji { font-size: 26px; }
+.today-stat strong { font-size: 22px; color: var(--ink); }
+.today-stat .today-label { font-size: 12px; color: var(--ink-soft); font-weight: 600; }
+.goal-box { flex: 1; min-width: 200px; }
+.goal-head { font-weight: 700; color: var(--ink-soft); margin-bottom: 6px; }
+.goal-head strong { color: var(--ink); }
+.goal-done { color: var(--green); font-weight: 800; }
+.goal-bar { height: 14px; background: #eef4fb; border-radius: 999px; overflow: hidden; }
+.goal-fill { height: 100%; background: linear-gradient(90deg, #34d399, #16a34a); transition: width 0.4s ease; }
+.goal-test-btn {
+  padding: 12px 18px;
+  border-radius: 16px;
+  font-weight: 800;
+  font-size: 15px;
+  background: #f3e8ff;
+  color: #7e22ce;
+  box-shadow: var(--shadow);
+  transition: transform 0.15s ease;
+}
+.goal-test-btn:hover { transform: scale(1.04); }
+
+.badge-row { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+.badge-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--card);
+  border-radius: 999px;
+  padding: 8px 16px;
+  box-shadow: var(--shadow);
+  font-weight: 700;
+}
+.badge-chip .badge-icon { font-size: 22px; }
+.badge-chip .badge-name { font-size: 14px; color: var(--ink); }
+
+.leaderboard { display: flex; flex-direction: column; gap: 8px; max-width: 520px; margin: 0 auto; }
+.lb-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--card);
+  border-radius: 14px;
+  padding: 10px 16px;
+  box-shadow: var(--shadow);
+}
+.lb-row.me { border: 3px solid var(--blue); }
+.lb-rank { font-size: 18px; font-weight: 800; width: 32px; text-align: center; }
+.lb-avatar { font-size: 26px; }
+.lb-name { flex: 1; font-weight: 800; }
+.lb-xp { font-weight: 800; color: #7c5800; }
+
 /* ---------- Confetti ---------- */
 .confetti-layer {
   position: fixed;

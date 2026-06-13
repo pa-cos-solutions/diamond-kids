@@ -18,6 +18,7 @@ import {
   updateDoc,
 } from 'firebase/firestore'
 import { auth, db } from './firebase'
+import { dayKey, yesterdayKey, earnedBadges } from './levels'
 
 const ACTIVE_KEY = 'dk-active-profile'
 
@@ -87,6 +88,15 @@ export function useProfiles() {
       name,
       avatar,
       stars: 0,
+      coins: 0,
+      level: 1,
+      streak: 0,
+      totalCorrect: 0,
+      totalAttempts: 0,
+      perfectRounds: 0,
+      weekSeconds: 0,
+      badges: [],
+      opStats: {},
       memoryBest: 0,
       flashWins: 0,
       drillsBestCorrect: 0,
@@ -111,6 +121,15 @@ export function useProfiles() {
   const resetProfile = async (id) => {
     await updateDoc(doc(db, 'users', user.uid, 'profiles', id), {
       stars: 0,
+      coins: 0,
+      streak: 0,
+      totalCorrect: 0,
+      totalAttempts: 0,
+      perfectRounds: 0,
+      weekSeconds: 0,
+      dailyCount: 0,
+      badges: [],
+      opStats: {},
       memoryBest: 0,
       flashWins: 0,
       drillsBestCorrect: 0,
@@ -149,6 +168,56 @@ export function useProfiles() {
     await deleteDoc(doc(db, 'users', user.uid, 'exerciseSets', id)).catch((e) => setError(e.message))
   }
 
+  const setProfileLevel = (level) => {
+    if (!activeProfile) return
+    updateDoc(profileRef(), { level }).catch((e) => setError(e.message))
+  }
+
+  // Apelat la finalul unei runde de exerciții — actualizează tot odată:
+  // monede, streak, obiectiv zilnic, totaluri, precizie pe operații, insigne, timp.
+  const reportSession = ({ correct = 0, attempts = 0, ops = {}, seconds = 0, coins = 0, perfect = false }) => {
+    if (!activeProfile) return
+    const p = activeProfile
+    const today = dayKey()
+    let streak = p.streak || 0
+    if (p.lastActiveDay !== today) {
+      streak = p.lastActiveDay === yesterdayKey() ? streak + 1 : 1
+    } else if (!streak) {
+      streak = 1
+    }
+    const dailyCount = (p.dailyDate === today ? p.dailyCount || 0 : 0) + correct
+
+    const opStats = { ...(p.opStats || {}) }
+    for (const [op, s] of Object.entries(ops)) {
+      const cur = opStats[op] || { c: 0, a: 0 }
+      opStats[op] = { c: cur.c + (s.c || 0), a: cur.a + (s.a || 0) }
+    }
+
+    const merged = {
+      ...p,
+      coins: (p.coins || 0) + coins,
+      streak,
+      totalCorrect: (p.totalCorrect || 0) + correct,
+      totalAttempts: (p.totalAttempts || 0) + attempts,
+      perfectRounds: (p.perfectRounds || 0) + (perfect ? 1 : 0),
+    }
+    const badges = Array.from(new Set([...(p.badges || []), ...earnedBadges(merged)]))
+
+    updateDoc(profileRef(), {
+      coins: merged.coins,
+      streak,
+      lastActiveDay: today,
+      dailyDate: today,
+      dailyCount,
+      totalCorrect: merged.totalCorrect,
+      totalAttempts: merged.totalAttempts,
+      perfectRounds: merged.perfectRounds,
+      weekSeconds: (p.weekSeconds || 0) + seconds,
+      opStats,
+      badges,
+    }).catch((e) => setError(e.message))
+  }
+
   const connectGoogle = async () => {
     const provider = new GoogleAuthProvider()
     try {
@@ -185,6 +254,8 @@ export function useProfiles() {
     deleteExerciseSet,
     addStars,
     reportRecord,
+    reportSession,
+    setProfileLevel,
     connectGoogle,
     signOutUser,
     error,

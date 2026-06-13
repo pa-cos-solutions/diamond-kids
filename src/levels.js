@@ -153,6 +153,67 @@ export function makeFlashSequence(level, count) {
   return { numbers, total }
 }
 
+// ---- Test de nivel (evaluare inițială) ----
+export function makePlacementTest() {
+  const qs = []
+  for (const lid of [1, 2, 3, 4]) {
+    const lvl = LEVELS.find((l) => l.id === lid)
+    qs.push(makeQuestion(lvl, lvl.drill.ops))
+    qs.push(makeQuestion(lvl, lvl.drill.ops))
+  }
+  return qs // 8 întrebări, dificultate crescătoare
+}
+
+export function recommendLevel(correct) {
+  if (correct <= 2) return 1
+  if (correct <= 4) return 2
+  if (correct <= 6) return 3
+  if (correct <= 7) return 4
+  return 5
+}
+
+// ---- Mini-tutor pe bază de reguli (explică greșeala) ----
+export function explain(a, op, b, answer) {
+  switch (op) {
+    case '+':
+      return `Adună întâi zecile, apoi unitățile: ${a} + ${b} = ${answer}.`
+    case '-':
+      return `Pornește de la ${b} și numără în sus până la ${a} — diferența este ${answer}.`
+    case '×':
+      return `${a} × ${b} înseamnă ${a} adunat de ${b} ori, adică ${answer}.`
+    case '÷':
+      return `Caută numărul care înmulțit cu ${b} dă ${a}: este ${answer}, pentru că ${b} × ${answer} = ${a}.`
+    default:
+      return `Răspunsul corect este ${answer}.`
+  }
+}
+
+// ---- Insigne (badges) ----
+export const BADGES = [
+  { id: 'first', icon: '🌱', name: 'Primul pas', test: (p) => (p.totalCorrect || 0) >= 1 },
+  { id: 'streak3', icon: '🔥', name: 'Serie de 3 zile', test: (p) => (p.streak || 0) >= 3 },
+  { id: 'streak7', icon: '🏅', name: 'O săptămână întreagă', test: (p) => (p.streak || 0) >= 7 },
+  { id: 'perfect', icon: '🏆', name: 'Rundă perfectă', test: (p) => (p.perfectRounds || 0) >= 1 },
+  { id: 'stars50', icon: '⭐', name: '50 de stele', test: (p) => (p.stars || 0) >= 50 },
+  { id: 'stars200', icon: '💫', name: '200 de stele', test: (p) => (p.stars || 0) >= 200 },
+  { id: 'correct100', icon: '💯', name: '100 de răspunsuri corecte', test: (p) => (p.totalCorrect || 0) >= 100 },
+  { id: 'coins100', icon: '🪙', name: '100 de monede', test: (p) => (p.coins || 0) >= 100 },
+]
+
+export function earnedBadges(profile) {
+  return BADGES.filter((b) => b.test(profile)).map((b) => b.id)
+}
+
+// ---- Date (zi / săptămână) pentru streak ----
+export function dayKey(d = new Date()) {
+  return d.toISOString().slice(0, 10) // YYYY-MM-DD
+}
+export function yesterdayKey() {
+  const d = new Date()
+  d.setDate(d.getDate() - 1)
+  return dayKey(d)
+}
+
 export const PRAISE = ['Bravo! 🎉', 'Corect! ⭐', 'Super! 🌟', 'Excelent! 🏆', 'Genial! 🤩', 'Așa da! 💪']
 export const ENCOURAGE = ['Hmm, mai încearcă! 🤔', 'Aproape! Nu te da bătut! 💪', 'Ups! Următoarea va fi a ta! 🍀']
 
