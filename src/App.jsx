@@ -12,6 +12,7 @@ import ProfileScreen from './components/ProfileScreen'
 import TeacherDashboard from './components/TeacherDashboard'
 import TeacherGate from './components/TeacherGate'
 import Confetti from './components/Confetti'
+import logoUrl from './assets/logo.png'
 
 const GAMES = {
   abacus: AbacusGame,
@@ -93,7 +94,7 @@ export default function App() {
   return (
     <>
       <Confetti trigger={confettiBurst} />
-      <img className="game-watermark" src="/logo.png" alt="SODO Kids Academy" />
+      <img className="game-watermark" src={logoUrl} alt="SODO Kids Academy" />
       <header className="header">
         {inGame && (
           <button className="back-btn" onClick={() => setScreen('home')}>
