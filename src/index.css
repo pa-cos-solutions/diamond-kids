@@ -364,6 +364,37 @@ button {
 
 .flash-dot.done { background: var(--blue); }
 
+/* ---------- Calcul mental: coloană ---------- */
+.formula-column {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  margin: 6px auto 4px;
+  padding: 14px 26px;
+  background: #f3f8fd;
+  border-radius: 16px;
+  font-variant-numeric: tabular-nums;
+}
+
+.formula-col-row {
+  font-size: clamp(28px, 7vw, 44px);
+  font-weight: 800;
+  line-height: 1.15;
+  font-family: 'Courier New', monospace;
+  white-space: pre;
+}
+
+.formula-col-line {
+  width: 100%;
+  height: 4px;
+  background: var(--ink);
+  border-radius: 2px;
+  margin: 4px 0;
+}
+
+.formula-col-q { color: var(--blue); }
+
 /* ---------- Question / feedback ---------- */
 .question-text {
   font-size: clamp(44px, 10vw, 80px);

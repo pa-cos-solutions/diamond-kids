@@ -153,6 +153,118 @@ export function makeFlashSequence(level, count) {
   return { numbers, total }
 }
 
+// ---- Calcul mental pe formule de soroban (trepte) ----
+// Pe un rod: valoarea 0–9 = 5·(bila „cer") + bile „pământ" (0–4).
+// Fiecare adunare/scădere se clasifică după procedeul (formula) de care are nevoie.
+
+function digits(lo, hi) {
+  const out = []
+  for (let d = lo; d <= hi; d++) out.push(d)
+  return out
+}
+const units = (t) => t % 10
+
+// Pe un rod (c = 0–9): se poate aduna/scădea d „direct", fără să spargem 5?
+function directAdd(c, d) {
+  if (c + d > 9) return false
+  const e = c % 5
+  if (d <= 4) return e + d <= 4
+  if (d === 5) return c <= 4
+  return c <= 4 && e + (d - 5) <= 4
+}
+function directSub(c, d) {
+  if (c - d < 0) return false
+  const e = c % 5
+  if (d <= 4) return e >= d
+  if (d === 5) return c >= 5
+  return c >= 5 && e >= d - 5
+}
+// Prietenii mici (formula lui 5), pe un rod
+function smallAdd(c, d) { return d >= 1 && d <= 4 && c <= 4 && c + d >= 5 && c + d <= 9 }
+function smallSub(c, d) { return d >= 1 && d <= 4 && c >= 5 && c - 5 < d }
+// Prietenii mari (formula lui 10), cu transport la zeci
+function bigAdd(t, d) { return d >= 1 && d <= 9 && units(t) + d >= 10 }
+function bigSub(t, d) { return d >= 1 && d <= 9 && units(t) < d && t - d >= 0 }
+
+// Treptele/formulele — copilul alege procedeul, ca pe platformele de calcul mental.
+// fAdds/fSubs = mutările care folosesc formula țintă; dAdds/dSubs = mutări „simple"
+// de legătură, ca secvența să curgă când formula nu se poate aplica pe moment.
+export const FORMULE = [
+  {
+    id: 'simple', treapta: 1, name: 'Numere simple', emoji: '1️⃣', color: '#22c55e',
+    desc: 'Adună și scade direct, fără formulă (0–9).', max: 9,
+    fAdds: (t) => digits(1, 9).filter((d) => directAdd(units(t), d)),
+    fSubs: (t) => digits(1, 9).filter((d) => directSub(units(t), d)),
+    dAdds: () => [], dSubs: () => [],
+  },
+  {
+    id: 'small', treapta: 2, name: 'Prietenii mici', emoji: '🤚', color: '#0ea5e9',
+    desc: 'Formula lui 5: +4 = +5 − 1, +3 = +5 − 2 …', max: 9,
+    fAdds: (t) => digits(1, 4).filter((d) => smallAdd(units(t), d)),
+    fSubs: (t) => digits(1, 4).filter((d) => smallSub(units(t), d)),
+    dAdds: (t) => digits(1, 9).filter((d) => t + d <= 9 && directAdd(units(t), d)),
+    dSubs: (t) => digits(1, 9).filter((d) => directSub(units(t), d)),
+  },
+  {
+    id: 'big', treapta: 3, name: 'Prietenii mari', emoji: '🙌', color: '#f59e0b',
+    desc: 'Formula lui 10: +9 = +10 − 1, +8 = +10 − 2 …', max: 99,
+    fAdds: (t) => digits(1, 9).filter((d) => t + d <= 99 && bigAdd(t, d)),
+    fSubs: (t) => digits(1, 9).filter((d) => bigSub(t, d)),
+    dAdds: (t) => digits(1, 9).filter((d) => t + d <= 99 && directAdd(units(t), d)),
+    dSubs: (t) => digits(1, 9).filter((d) => directSub(units(t), d)),
+  },
+  {
+    id: 'mixed', treapta: 4, name: 'Formule combinate', emoji: '🧩', color: '#f97316',
+    desc: 'Amestec de prieteni mici și mari, până la 99.', max: 99,
+    fAdds: (t) => digits(1, 9).filter((d) => t + d <= 99 && (smallAdd(units(t), d) || bigAdd(t, d))),
+    fSubs: (t) => digits(1, 9).filter((d) => smallSub(units(t), d) || bigSub(t, d)),
+    dAdds: (t) => digits(1, 9).filter((d) => t + d <= 99 && directAdd(units(t), d)),
+    dSubs: (t) => digits(1, 9).filter((d) => directSub(units(t), d)),
+  },
+  {
+    id: 'big2', treapta: 5, name: 'Numere mari', emoji: '🔢', color: '#a855f7',
+    desc: 'Adunări și scăderi cu numere de două cifre (până la 999).', max: 999,
+    twoDigit: true,
+  },
+]
+
+// Construiește o secvență de `count` numere cu semn, validă pentru formula aleasă.
+// Răspunsul corect este `total` (suma rulantă, care rămâne mereu ≥ 0).
+export function makeFormulaSequence(formula, count) {
+  const numbers = []
+  let total = 0
+  for (let i = 0; i < count; i++) {
+    if (formula.twoDigit) {
+      let n
+      if (i > 0 && total >= 10 && Math.random() < 0.4) {
+        n = -rand(10, Math.min(99, total))
+      } else {
+        const room = formula.max - total
+        n = room >= 10 ? rand(10, Math.min(99, room)) : rand(1, Math.max(1, room))
+      }
+      numbers.push(n)
+      total += n
+      continue
+    }
+    const fMoves = [
+      ...formula.fAdds(total),
+      ...(i > 0 ? formula.fSubs(total).map((d) => -d) : []),
+    ]
+    const dMoves = [
+      ...formula.dAdds(total),
+      ...(i > 0 ? formula.dSubs(total).map((d) => -d) : []),
+    ]
+    let n
+    if (fMoves.length && i > 0 && Math.random() < 0.8) n = pick(fMoves)
+    else if (dMoves.length) n = pick(dMoves)
+    else if (fMoves.length) n = pick(fMoves)
+    else break
+    numbers.push(n)
+    total += n
+  }
+  return { numbers, total }
+}
+
 // ---- Test de nivel (evaluare inițială) ----
 export function makePlacementTest() {
   const qs = []

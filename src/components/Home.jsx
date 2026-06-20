@@ -9,6 +9,13 @@ const GAMES = [
     color: 'var(--orange)',
   },
   {
+    id: 'formule',
+    emoji: '🪜',
+    title: 'Calcul mental pe formule',
+    desc: 'Alege treapta (prietenii mici, prietenii mari…) și exersează exact acel procedeu!',
+    color: 'var(--blue)',
+  },
+  {
     id: 'flash',
     emoji: '⚡',
     title: 'Flash Anzan',

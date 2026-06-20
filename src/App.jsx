@@ -5,6 +5,7 @@ import Home from './components/Home'
 import AbacusGame from './components/AbacusGame'
 import FlashAnzan from './components/FlashAnzan'
 import Drills from './components/Drills'
+import FormulaPractice from './components/FormulaPractice'
 import MemoryGame from './components/MemoryGame'
 import CustomDrill from './components/CustomDrill'
 import Placement from './components/Placement'
@@ -18,6 +19,7 @@ const GAMES = {
   abacus: AbacusGame,
   flash: FlashAnzan,
   drills: Drills,
+  formule: FormulaPractice,
   memory: MemoryGame,
 }
 
