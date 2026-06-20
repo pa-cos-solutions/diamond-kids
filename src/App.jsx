@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { LEVELS } from './levels'
 import { useProfiles } from './useProfiles'
 import Home from './components/Home'
 import AbacusGame from './components/AbacusGame'
@@ -27,7 +26,6 @@ const TEACHER_ROUTE = '#/profesor'
 
 export default function App() {
   const [screen, setScreen] = useState('home')
-  const [levelId, setLevelId] = useState(1)
   const [starBump, setStarBump] = useState(0)
   const [confettiBurst, setConfettiBurst] = useState(0)
   const [activeSet, setActiveSet] = useState(null)
@@ -63,13 +61,10 @@ export default function App() {
     addStars: addStarsDb,
     reportRecord,
     reportSession,
-    setProfileLevel,
     connectGoogle,
     signOutUser,
     error,
   } = useProfiles()
-
-  const level = LEVELS.find((l) => l.id === levelId)
 
   const addStars = (n) => {
     addStarsDb(n)
@@ -111,11 +106,6 @@ export default function App() {
           </span>
         </div>
         <div className="header-spacer" />
-        {inGame && GAMES[screen] && (
-          <div className="level-pill">
-            {level.emoji} {level.name}
-          </div>
-        )}
         {!isTeacherRoute && activeProfile && (
           <button
             className="profile-pill"
@@ -169,20 +159,11 @@ export default function App() {
           error={error}
         />
       ) : screen === 'placement' ? (
-        <Placement
-          onDone={(lid) => {
-            setProfileLevel(lid)
-            setLevelId(lid)
-            setScreen('home')
-          }}
-          onCancel={() => setScreen('home')}
-        />
+        <Placement onDone={goHome} onCancel={() => setScreen('home')} />
       ) : screen === 'home' ? (
         <Home
-          level={level}
           profile={activeProfile}
           profiles={profiles}
-          onSelectLevel={setLevelId}
           onSelectGame={setScreen}
           onStartPlacement={() => setScreen('placement')}
           sets={exerciseSets}
@@ -198,7 +179,6 @@ export default function App() {
         />
       ) : (
         <Game
-          level={level}
           onStars={addStars}
           onCelebrate={celebrate}
           onRecord={reportRecord}

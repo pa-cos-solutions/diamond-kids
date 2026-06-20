@@ -1,4 +1,4 @@
-import { LEVELS, BADGES, dayKey } from '../levels'
+import { BADGES, dayKey } from '../levels'
 
 const GAMES = [
   {
@@ -41,10 +41,8 @@ const GAMES = [
 const DAILY_GOAL = 10
 
 export default function Home({
-  level,
   profile,
   profiles = [],
-  onSelectLevel,
   onSelectGame,
   onStartPlacement,
   sets = [],
@@ -96,25 +94,7 @@ export default function Home({
         </button>
       </div>
 
-      <div className="section-label">1️⃣ Alege nivelul tău:</div>
-      <div className="level-chips">
-        {LEVELS.map((l) => (
-          <button
-            key={l.id}
-            className={`level-chip ${l.id === level.id ? 'active' : ''}`}
-            style={{ color: l.color }}
-            onClick={() => onSelectLevel(l.id)}
-          >
-            <span className="chip-emoji">{l.emoji}</span>
-            <span className="chip-name" style={{ color: 'var(--ink)' }}>
-              {l.name}
-            </span>
-            <span className="chip-age">{l.age}</span>
-          </button>
-        ))}
-      </div>
-
-      <div className="section-label">2️⃣ Alege un joc:</div>
+      <div className="section-label">Alege un joc:</div>
       <div className="game-grid">
         {GAMES.map((g) => (
           <button

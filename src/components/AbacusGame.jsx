@@ -9,8 +9,10 @@ const MODES = [
   { id: 'read', label: '👀 Citește abacul' },
 ]
 
-export default function AbacusGame({ level, onStars, onCelebrate, onRecord = () => {} }) {
-  const rods = level.abacus.rods
+const ROD_OPTIONS = [2, 3, 4, 5]
+
+export default function AbacusGame({ onStars, onCelebrate, onRecord = () => {} }) {
+  const [rods, setRods] = useState(3)
   const maxNumber = Math.pow(10, rods) - 1
 
   const [mode, setMode] = useState('free')
@@ -39,6 +41,15 @@ export default function AbacusGame({ level, onStars, onCelebrate, onRecord = () 
     setFeedback(null)
     setSolved(false)
     setTarget(rand(1, maxNumber))
+  }
+
+  const chooseRods = (r) => {
+    setRods(r)
+    setValue(0)
+    setAnswer('')
+    setFeedback(null)
+    setSolved(false)
+    setTarget(rand(1, Math.pow(10, r) - 1))
   }
 
   // în modul „construiește": detectăm automat când abacul arată numărul țintă
@@ -83,6 +94,19 @@ export default function AbacusGame({ level, onStars, onCelebrate, onRecord = () 
       <p className="game-subtitle">
         Bilele de sus valorează 5, bilele de jos valorează 1. Apropie-le de bară ca să numere!
       </p>
+
+      <div className="option-row">
+        <span className="option-label">Câte tije?</span>
+        {ROD_OPTIONS.map((r) => (
+          <button
+            key={r}
+            className={`option-btn ${rods === r ? 'active' : ''}`}
+            onClick={() => chooseRods(r)}
+          >
+            {r}
+          </button>
+        ))}
+      </div>
 
       <div className="mode-tabs">
         {MODES.map((m) => (

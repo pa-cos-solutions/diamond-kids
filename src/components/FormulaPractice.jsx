@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import NumberPad from './NumberPad'
-import { FORMULE, makeFormulaSequence, pick, PRAISE } from '../levels'
+import TreaptaPicker from './TreaptaPicker'
+import { makeFormulaSequence, pick, PRAISE } from '../levels'
 
 const SPEEDS = [
   { label: '🐢 Lent', ms: 2500 },
@@ -93,23 +94,7 @@ export default function FormulaPractice({ onStars, onCelebrate, onRecord = () =>
       <h2 className="game-title">🪜 Calcul mental pe formule</h2>
 
       {phase === 'pick' && (
-        <>
-          <p className="game-subtitle">Alege treapta — exersezi exact procedeul ei.</p>
-          <div className="game-grid">
-            {FORMULE.map((f) => (
-              <button
-                key={f.id}
-                className="game-card"
-                style={{ borderBottomColor: f.color }}
-                onClick={() => { setFormula(f); setPhase('config') }}
-              >
-                <span className="game-emoji">{f.emoji}</span>
-                <h3>Treapta {f.treapta} · {f.name}</h3>
-                <p>{f.desc}</p>
-              </button>
-            ))}
-          </div>
-        </>
+        <TreaptaPicker onPick={(f) => { setFormula(f); setPhase('config') }} />
       )}
 
       {phase !== 'pick' && formula && (

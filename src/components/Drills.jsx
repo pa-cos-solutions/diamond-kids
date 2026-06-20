@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
 import NumberPad from './NumberPad'
-import { makeQuestion, OP_NAMES, pick, PRAISE, ENCOURAGE, explain } from '../levels'
+import TreaptaPicker from './TreaptaPicker'
+import { makeFormulaQuestion, pick, PRAISE, ENCOURAGE, explain } from '../levels'
 
 const ROUND_SIZE = 10
 
-export default function Drills({ level, onStars, onCelebrate, onRecord = () => {}, onSession = () => {} }) {
-  const allOps = level.drill.ops
-  const [selectedOps, setSelectedOps] = useState(allOps)
-  const [phase, setPhase] = useState('config') // config | play | summary
+export default function Drills({ onStars, onCelebrate, onRecord = () => {}, onSession = () => {} }) {
+  const [formula, setFormula] = useState(null)
+  const [phase, setPhase] = useState('pick') // pick | play | summary
   const [question, setQuestion] = useState(null)
   const [qIndex, setQIndex] = useState(0)
   const [correct, setCorrect] = useState(0)
@@ -18,18 +18,9 @@ export default function Drills({ level, onStars, onCelebrate, onRecord = () => {
   const timerRef = useRef(null)
   const tally = useRef({})
 
-  // selecția de operații se resetează când se schimbă nivelul
-  useEffect(() => setSelectedOps(level.drill.ops), [level])
-
   useEffect(() => () => clearInterval(timerRef.current), [])
 
-  const toggleOp = (op) => {
-    setSelectedOps((ops) =>
-      ops.includes(op) ? (ops.length > 1 ? ops.filter((o) => o !== op) : ops) : [...ops, op]
-    )
-  }
-
-  const start = () => {
+  const start = (f = formula) => {
     setQIndex(0)
     setCorrect(0)
     setStreak(0)
@@ -37,10 +28,15 @@ export default function Drills({ level, onStars, onCelebrate, onRecord = () => {
     setAnswer('')
     setFeedback(null)
     tally.current = {}
-    setQuestion(makeQuestion(level, selectedOps))
+    setQuestion(makeFormulaQuestion(f))
     setPhase('play')
     clearInterval(timerRef.current)
     timerRef.current = setInterval(() => setElapsed((e) => e + 1), 1000)
+  }
+
+  const pickTreapta = (f) => {
+    setFormula(f)
+    start(f)
   }
 
   const check = (n) => {
@@ -87,7 +83,7 @@ export default function Drills({ level, onStars, onCelebrate, onRecord = () => {
         }
       } else {
         setQIndex(next)
-        setQuestion(makeQuestion(level, selectedOps))
+        setQuestion(makeFormulaQuestion(formula))
       }
     }, good ? 900 : 2600)
   }
@@ -98,26 +94,18 @@ export default function Drills({ level, onStars, onCelebrate, onRecord = () => {
   return (
     <div className="game-screen">
       <h2 className="game-title">⏱️ Exerciții cronometrate</h2>
-      <p className="game-subtitle">Rezolvă {ROUND_SIZE} exerciții cât de repede poți!</p>
 
-      {phase === 'config' && (
-        <>
-          <div className="option-row">
-            <span className="option-label">Ce operații vrei să exersezi?</span>
-            {allOps.map((op) => (
-              <button
-                key={op}
-                className={`option-btn ${selectedOps.includes(op) ? 'active' : ''}`}
-                onClick={() => toggleOp(op)}
-              >
-                {op} {OP_NAMES[op]}
-              </button>
-            ))}
-          </div>
-          <button className="big-btn" onClick={start}>
-            Start! 🚀
-          </button>
-        </>
+      {phase === 'pick' && (
+        <TreaptaPicker
+          onPick={pickTreapta}
+          subtitle={`Rezolvă ${ROUND_SIZE} exerciții cât de repede poți! Alege întâi treapta.`}
+        />
+      )}
+
+      {phase !== 'pick' && formula && (
+        <p className="game-subtitle">
+          {formula.emoji} <strong>Treapta {formula.treapta} · {formula.name}</strong> — {formula.desc}
+        </p>
       )}
 
       {phase === 'play' && (
@@ -166,11 +154,9 @@ export default function Drills({ level, onStars, onCelebrate, onRecord = () => {
               Timp: <strong>{elapsed}s</strong>
             </div>
           </div>
-          <button className="big-btn" onClick={start}>
-            Încă o rundă! 🔄
-          </button>{' '}
-          <button className="big-btn blue" onClick={() => setPhase('config')}>
-            Schimbă operațiile ⚙️
+          <button className="big-btn" onClick={() => start()}>Încă o rundă! 🔄</button>{' '}
+          <button className="big-btn blue" onClick={() => setPhase('pick')}>
+            🪜 Altă treaptă
           </button>
         </>
       )}

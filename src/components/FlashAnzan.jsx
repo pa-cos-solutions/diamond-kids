@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import NumberPad from './NumberPad'
-import { makeFlashSequence, pick, PRAISE } from '../levels'
+import TreaptaPicker from './TreaptaPicker'
+import { makeFormulaSequence, pick, PRAISE } from '../levels'
 
 const SPEEDS = [
   { label: '🐢 Lent', ms: 2500 },
@@ -8,13 +9,13 @@ const SPEEDS = [
   { label: '🏃 Rapid', ms: 800 },
   { label: '⚡ Fulger', ms: 500 },
 ]
-
 const COUNTS = [3, 5, 7, 10]
 
-export default function FlashAnzan({ level, onStars, onCelebrate, onRecord = () => {} }) {
-  const [phase, setPhase] = useState('config') // config | countdown | flash | answer | result
-  const [speed, setSpeed] = useState(level.flash.defaultSpeed)
-  const [count, setCount] = useState(level.flash.defaultCount)
+export default function FlashAnzan({ onStars, onCelebrate, onRecord = () => {} }) {
+  const [formula, setFormula] = useState(null)
+  const [phase, setPhase] = useState('pick') // pick | config | countdown | flash | answer | result
+  const [speed, setSpeed] = useState(1500)
+  const [count, setCount] = useState(5)
   const [sequence, setSequence] = useState(null)
   const [index, setIndex] = useState(-1)
   const [showNumber, setShowNumber] = useState(false)
@@ -29,7 +30,7 @@ export default function FlashAnzan({ level, onStars, onCelebrate, onRecord = () 
   const later = (fn, ms) => timers.current.push(setTimeout(fn, ms))
 
   const start = () => {
-    setSequence(makeFlashSequence(level, count))
+    setSequence(makeFormulaSequence(formula, count))
     setAnswer('')
     setResult(null)
     setCountdown(3)
@@ -79,11 +80,21 @@ export default function FlashAnzan({ level, onStars, onCelebrate, onRecord = () 
   return (
     <div className="game-screen">
       <h2 className="game-title">⚡ Flash Anzan</h2>
-      <p className="game-subtitle">
-        Numerele apar unul câte unul. Adună-le în minte, apoi scrie totalul!
-      </p>
 
-      {rounds.played > 0 && (
+      {phase === 'pick' && (
+        <TreaptaPicker
+          onPick={(f) => { setFormula(f); setPhase('config') }}
+          subtitle="Numerele apar pe rând — adună-le în minte. Alege întâi treapta!"
+        />
+      )}
+
+      {phase !== 'pick' && formula && (
+        <p className="game-subtitle">
+          {formula.emoji} <strong>Treapta {formula.treapta} · {formula.name}</strong> — {formula.desc}
+        </p>
+      )}
+
+      {rounds.played > 0 && phase !== 'pick' && (
         <div className="stat-row">
           <div className="stat-chip">
             Runde câștigate: <strong>{rounds.won} / {rounds.played}</strong>
@@ -117,8 +128,9 @@ export default function FlashAnzan({ level, onStars, onCelebrate, onRecord = () 
               </button>
             ))}
           </div>
-          <button className="big-btn" onClick={start}>
-            Start! 🚀
+          <button className="big-btn" onClick={start}>Start! 🚀</button>{' '}
+          <button className="big-btn blue" onClick={() => setPhase('pick')}>
+            ⬅ Altă treaptă
           </button>
         </>
       )}
@@ -170,11 +182,12 @@ export default function FlashAnzan({ level, onStars, onCelebrate, onRecord = () 
               <strong>{sequence.numbers.map(fmt).join('  ,  ')}</strong>
             </div>
           </div>
-          <button className="big-btn" onClick={start}>
-            Încă o rundă! 🔄
-          </button>{' '}
+          <button className="big-btn" onClick={start}>Încă o rundă! 🔄</button>{' '}
           <button className="big-btn blue" onClick={() => setPhase('config')}>
             Schimbă setările ⚙️
+          </button>{' '}
+          <button className="big-btn" onClick={() => setPhase('pick')}>
+            🪜 Altă treaptă
           </button>
         </>
       )}

@@ -8,18 +8,25 @@ function makeNumber(len) {
   return s
 }
 
-export default function MemoryGame({ level, onStars, onCelebrate, onRecord = () => {} }) {
-  const startLen = level.memory.start
+const START_OPTIONS = [2, 3, 4, 5]
+
+export default function MemoryGame({ onStars, onCelebrate, onRecord = () => {} }) {
+  const [startLen, setStartLen] = useState(3)
   const [phase, setPhase] = useState('intro') // intro | show | recall | result
-  const [length, setLength] = useState(startLen)
+  const [length, setLength] = useState(3)
   const [best, setBest] = useState(0)
   const [number, setNumber] = useState('')
   const [answer, setAnswer] = useState('')
   const [result, setResult] = useState(null)
   const timerRef = useRef(null)
 
-  useEffect(() => setLength(level.memory.start), [level])
   useEffect(() => () => clearTimeout(timerRef.current), [])
+
+  const chooseStart = (n) => {
+    setStartLen(n)
+    setLength(n)
+    setBest(0)
+  }
 
   const show = (len) => {
     const n = makeNumber(len)
@@ -68,6 +75,18 @@ export default function MemoryGame({ level, onStars, onCelebrate, onRecord = () 
 
       {phase === 'intro' && (
         <>
+          <div className="option-row">
+            <span className="option-label">Câte cifre la început?</span>
+            {START_OPTIONS.map((n) => (
+              <button
+                key={n}
+                className={`option-btn ${startLen === n ? 'active' : ''}`}
+                onClick={() => chooseStart(n)}
+              >
+                {n}
+              </button>
+            ))}
+          </div>
           <div className="flash-stage">
             <div className="memory-hidden">? ? ?</div>
           </div>

@@ -191,7 +191,7 @@ function bigSub(t, d) { return d >= 1 && d <= 9 && units(t) < d && t - d >= 0 }
 // de legătură, ca secvența să curgă când formula nu se poate aplica pe moment.
 export const FORMULE = [
   {
-    id: 'simple', treapta: 1, name: 'Numere simple', emoji: '1️⃣', color: '#22c55e',
+    id: 'simple', treapta: 1, name: 'Calcul direct', emoji: '1️⃣', color: '#22c55e',
     desc: 'Adună și scade direct, fără formulă (0–9).', max: 9,
     fAdds: (t) => digits(1, 9).filter((d) => directAdd(units(t), d)),
     fSubs: (t) => digits(1, 9).filter((d) => directSub(units(t), d)),
@@ -263,6 +263,37 @@ export function makeFormulaSequence(formula, count) {
     total += n
   }
   return { numbers, total }
+}
+
+// Un singur exercițiu (a ± b) care folosește exact procedeul treptei alese.
+export function makeFormulaQuestion(formula) {
+  if (formula.twoDigit) {
+    const a = rand(10, 99)
+    if (Math.random() < 0.5) {
+      const b = rand(10, 99)
+      return { a, op: '+', b, answer: a + b, text: `${a} + ${b}` }
+    }
+    const b = rand(10, a)
+    return { a, op: '-', b, answer: a - b, text: `${a} − ${b}` }
+  }
+  // pornim de la o valoare validă și aplicăm o mutare pe formulă;
+  // permitem și un start de 2 cifre ca să apară scăderea cu „prietenii mari" (cu împrumut)
+  for (let tries = 0; tries < 40; tries++) {
+    const start = rand(0, Math.min(formula.max, 18))
+    const moves = [...formula.fAdds(start), ...formula.fSubs(start).map((d) => -d)]
+    if (!moves.length) continue
+    const m = pick(moves)
+    const total = start + m
+    if (total < 0 || total > formula.max) continue
+    const op = m < 0 ? '-' : '+'
+    const sign = op === '-' ? '−' : '+'
+    return { a: start, op, b: Math.abs(m), answer: total, text: `${start} ${sign} ${Math.abs(m)}` }
+  }
+  // rezervă: o secvență de 2 termeni
+  const s = makeFormulaSequence(formula, 2)
+  const m = s.numbers[1] || 0
+  const op = m < 0 ? '-' : '+'
+  return { a: s.numbers[0], op, b: Math.abs(m), answer: s.total, text: `${s.numbers[0]} ${op === '-' ? '−' : '+'} ${Math.abs(m)}` }
 }
 
 // ---- Test de nivel (evaluare inițială) ----

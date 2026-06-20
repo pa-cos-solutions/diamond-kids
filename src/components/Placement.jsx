@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import NumberPad from './NumberPad'
-import { LEVELS, makePlacementTest, recommendLevel } from '../levels'
+import { FORMULE, makePlacementTest, recommendLevel } from '../levels'
 
-// Evaluare inițială: 8 exerciții cu dificultate crescătoare → nivel recomandat
+// Evaluare inițială: 8 exerciții cu dificultate crescătoare → treaptă recomandată
 export default function Placement({ onDone, onCancel }) {
   const [test] = useState(() => makePlacementTest())
   const [i, setI] = useState(0)
@@ -27,19 +27,20 @@ export default function Placement({ onDone, onCancel }) {
 
   if (done) {
     const lid = recommendLevel(correct)
-    const lvl = LEVELS.find((l) => l.id === lid)
+    const treapta = FORMULE[Math.min(lid, FORMULE.length) - 1]
     return (
       <div className="game-screen">
         <h2 className="game-title">🎯 Rezultatul testului</h2>
-        <div className="result-stars">{lvl.emoji}</div>
+        <div className="result-stars">{treapta.emoji}</div>
         <div className="result-message">
           Ai răspuns corect la {correct} din {test.length}.
         </div>
         <p className="game-subtitle">
-          Nivelul recomandat: <strong>{lvl.name}</strong> ({lvl.age})
+          Îți recomandăm să începi de la{' '}
+          <strong>Treapta {treapta.treapta} · {treapta.name}</strong>. O alegi când intri într-un joc de calcul.
         </p>
-        <button className="big-btn" onClick={() => onDone(lid)}>
-          Începe la nivelul {lvl.name} 🚀
+        <button className="big-btn" onClick={onDone}>
+          Am înțeles, hai la joacă! 🚀
         </button>
       </div>
     )
@@ -48,7 +49,7 @@ export default function Placement({ onDone, onCancel }) {
   return (
     <div className="game-screen">
       <h2 className="game-title">🎯 Test de nivel</h2>
-      <p className="game-subtitle">Rezolvă exercițiile ca să-ți găsim nivelul potrivit.</p>
+      <p className="game-subtitle">Rezolvă exercițiile ca să-ți găsim treapta potrivită.</p>
       <div className="stat-row">
         <div className="stat-chip">
           Întrebarea{' '}
